@@ -8,7 +8,7 @@ from .routes import app
 
 def create_app():
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://notesai_user:LS9drpA2s84V7RDtkCwuWwDKJTSl3C78@dpg-cjeh0egcfp5c73en5s40-a.ohio-postgres.render.com/notesai'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
     #'sqlite:///users.sqlite3'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
