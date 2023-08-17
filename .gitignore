@@ -1,0 +1,6 @@
+.venv/
+instance/
+langchain_data/
+chromadb/
+myenv/
+__pycache__/
