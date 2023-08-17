@@ -4,3 +4,4 @@ langchain_data/
 chromadb/
 myenv/
 __pycache__/
+app.py
