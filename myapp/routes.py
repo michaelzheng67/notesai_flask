@@ -187,7 +187,8 @@ def post_document():
     # chroma_db.persist()
 
     # update variable in note object
-    note.chroma_parts = len(docs)
+    # note.chroma_parts = len(docs)
+    note.chroma_parts = 1
 
     db.session.add(note)
     
