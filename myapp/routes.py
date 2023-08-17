@@ -123,9 +123,9 @@ def update_document():
 
         # delete old data then add new data to ChromaDB
         embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-        chroma_db = Chroma(embedding_function= embedding_function, persist_directory="./chromadb")
+        chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
         chroma_db._collection.delete(ids=old_ids)
-        chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory="./chromadb", ids=new_ids)
+        chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=new_ids)
         chroma_db.persist()
 
         existing_note.chroma_parts = len(docs)
@@ -179,7 +179,7 @@ def post_document():
 
     # actually add to ChromaDB instance
     embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory="./chromadb", ids=ids)
+    chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=ids)
     chroma_db.persist()
 
     # update variable in note object
@@ -225,7 +225,7 @@ def delete_document():
 
     # delete from chroma
     embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    chroma_db = Chroma(embedding_function= embedding_function, persist_directory="./chromadb")
+    chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
     chroma_db._collection.delete(ids=old_ids)
     chroma_db.persist()
 
@@ -316,7 +316,7 @@ def query():
 
     # query on it
     embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    db = Chroma(persist_directory="./chromadb", embedding_function=embedding_function)
+    db = Chroma(persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), embedding_function=embedding_function)
     docs = db.similarity_search(query_string, k=int(user.similarity))
 
     temp_str = "summarize the following in " + str(user.wordcount) + " words or less: "
@@ -356,9 +356,9 @@ def post_settings():
 
     user = users.query.filter_by(user_id=uid).first()
     
-    user.temperature = temperature
-    user.similarity = similarity
-    user.wordcount = wordcount
+    user.temperature = str(temperature)
+    user.similarity = str(similarity)
+    user.wordcount = str(wordcount)
 
     db.session.commit()
 
