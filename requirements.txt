@@ -15,7 +15,7 @@ dataclasses-json==0.5.14
 exceptiongroup==1.1.2
 fastapi==0.99.1
 filelock==3.12.2
-Flask==2.3.2
+Flask==2.2.5
 Flask-SQLAlchemy==3.0.5
 flatbuffers==23.5.26
 frozenlist==1.4.0
