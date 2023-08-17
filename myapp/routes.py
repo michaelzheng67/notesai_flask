@@ -147,6 +147,10 @@ def post_document():
 
     user = users.query.filter_by(user_id=uid).first()
 
+    if user is None:
+        return "user not found"
+
+
     # create notebook if it doesn't exist
     notebook_obj = notebooks.query.filter_by(user_id=user._id, name=notebook).first()
 
