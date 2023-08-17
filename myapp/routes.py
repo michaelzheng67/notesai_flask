@@ -176,15 +176,15 @@ def post_document():
     # add to ChromaDB
 
     # turn text content into Document form
-    curr_doc = Document(page_content=note.content)
-    documents = [curr_doc]
-    docs = text_splitter.split_documents(documents)
-    ids = [title + str(i) for i in range(1, len(docs) + 1)]
+    # curr_doc = Document(page_content=note.content)
+    # documents = [curr_doc]
+    # docs = text_splitter.split_documents(documents)
+    # ids = [title + str(i) for i in range(1, len(docs) + 1)]
 
-    # actually add to ChromaDB instance
-    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=ids)
-    chroma_db.persist()
+    # # actually add to ChromaDB instance
+    # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    # chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=ids)
+    # chroma_db.persist()
 
     # update variable in note object
     note.chroma_parts = len(docs)
