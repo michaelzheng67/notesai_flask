@@ -105,10 +105,10 @@ def update_document():
         # update in ChromaDB
 
         # get old data in Document form
-        curr_doc = Document(page_content=existing_note.content)
-        documents = [curr_doc]
-        docs = text_splitter.split_documents(documents)
-        old_ids = [existing_note.title + str(i) for i in range(1, len(docs) + 1)]
+        # curr_doc = Document(page_content=existing_note.content)
+        # documents = [curr_doc]
+        # docs = text_splitter.split_documents(documents)
+        # old_ids = [existing_note.title + str(i) for i in range(1, len(docs) + 1)]
 
 
         # update the existing note's content
@@ -117,19 +117,20 @@ def update_document():
 
         # insert into ChromaDB
         # turn text content into Document form
-        curr_doc = Document(page_content=existing_note.content)
-        documents = [curr_doc]
-        docs = text_splitter.split_documents(documents)
-        new_ids = [title + str(i) for i in range(1, len(docs) + 1)]
+        # curr_doc = Document(page_content=existing_note.content)
+        # documents = [curr_doc]
+        # docs = text_splitter.split_documents(documents)
+        # new_ids = [title + str(i) for i in range(1, len(docs) + 1)]
 
         # delete old data then add new data to ChromaDB
         # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-        chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
-        chroma_db._collection.delete(ids=old_ids)
-        chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=new_ids)
-        chroma_db.persist()
+        # chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
+        # chroma_db._collection.delete(ids=old_ids)
+        # chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=new_ids)
+        # chroma_db.persist()
 
-        existing_note.chroma_parts = len(docs)
+        # existing_note.chroma_parts = len(docs)
+        existing_note.chroma_parts = 1
 
         db.session.add(existing_note)
         db.session.commit()
@@ -156,10 +157,10 @@ def post_document():
     notebook_obj = notebooks.query.filter_by(user_id=user._id, name=notebook).first()
 
     # chromaDB variables
-    docs = None
-    documents = None
-    text_splitter = CharacterTextSplitter()
-    ids = None
+    # docs = None
+    # documents = None
+    # text_splitter = CharacterTextSplitter()
+    # ids = None
 
     if not notebook_obj:
         notebook_obj = notebooks(user_id=user._id, name=notebook)
@@ -177,15 +178,15 @@ def post_document():
     # add to ChromaDB
 
     # turn text content into Document form
-    curr_doc = Document(page_content=note.content)
-    documents = [curr_doc]
-    docs = text_splitter.split_documents(documents)
-    ids = [title + str(i) for i in range(1, len(docs) + 1)]
+    # curr_doc = Document(page_content=note.content)
+    # documents = [curr_doc]
+    # docs = text_splitter.split_documents(documents)
+    # ids = [title + str(i) for i in range(1, len(docs) + 1)]
 
     # actually add to ChromaDB instance
-    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=ids)
-    chroma_db.persist()
+    # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    # chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=ids)
+    # chroma_db.persist()
 
     # update variable in note object
     note.chroma_parts = len(docs)
@@ -222,17 +223,17 @@ def delete_document():
 
     # Delete the note
     # get old data in Document form
-    curr_doc = Document(page_content=note_obj.content)
-    documents = [curr_doc]
-    text_splitter = CharacterTextSplitter()
-    docs = text_splitter.split_documents(documents)
-    old_ids = [note_obj.title + str(i) for i in range(1, len(docs) + 1)]
+    # curr_doc = Document(page_content=note_obj.content)
+    # documents = [curr_doc]
+    # text_splitter = CharacterTextSplitter()
+    # docs = text_splitter.split_documents(documents)
+    # old_ids = [note_obj.title + str(i) for i in range(1, len(docs) + 1)]
 
-    # delete from chroma
-    # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
-    chroma_db._collection.delete(ids=old_ids)
-    chroma_db.persist()
+    # # delete from chroma
+    # # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    # chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
+    # chroma_db._collection.delete(ids=old_ids)
+    # chroma_db.persist()
 
     db.session.delete(note_obj)
     db.session.commit()
