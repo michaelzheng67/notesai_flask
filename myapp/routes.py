@@ -19,6 +19,7 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
 from langchain import PromptTemplate
 
+embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 app = Flask(__name__)
 
 # Centralized endpoints that allow for storage as well as calls to langchain / openAI
@@ -122,7 +123,7 @@ def update_document():
         new_ids = [title + str(i) for i in range(1, len(docs) + 1)]
 
         # delete old data then add new data to ChromaDB
-        embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+        # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
         chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
         chroma_db._collection.delete(ids=old_ids)
         chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=new_ids)
@@ -181,7 +182,7 @@ def post_document():
     # docs = text_splitter.split_documents(documents)
     # ids = [title + str(i) for i in range(1, len(docs) + 1)]
 
-    # # actually add to ChromaDB instance
+    # actually add to ChromaDB instance
     # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     # chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), ids=ids)
     # chroma_db.persist()
@@ -229,7 +230,7 @@ def delete_document():
     old_ids = [note_obj.title + str(i) for i in range(1, len(docs) + 1)]
 
     # delete from chroma
-    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     chroma_db = Chroma(embedding_function= embedding_function, persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]))
     chroma_db._collection.delete(ids=old_ids)
     chroma_db.persist()
@@ -320,7 +321,7 @@ def query():
 
 
     # query on it
-    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     db = Chroma(persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), embedding_function=embedding_function)
     docs = db.similarity_search(query_string, k=int(user.similarity))
 
