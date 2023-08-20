@@ -336,7 +336,6 @@ def create_chromadb():
             ids = [note.title + str(i) for i in range(1, len(docs) + 1)]
 
             # actually add to ChromaDB instance
-            embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
             chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"), ids=ids)
             chroma_db.persist()
 
