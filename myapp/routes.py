@@ -309,8 +309,46 @@ def delete_notebook():
     return jsonify({'message': 'Note and notebook deleted successfully'})
 
 
+# POST endpoint for creating chromadb for given user
+@app.route('/create-chroma', methods=['POST'])
+def create_chromadb():
+    uid = request.json["uid"]
+
+    user = users.query.filter_by(user_id=uid).first()
+
+     # If user not found, return an empty list
+    if not user:
+        return "No such user exists"
+    
+    
+    # Iterate over all the notebooks owned by the user
+    for notebook in user.notebook:
+        
+        # iterate over each note and add it to chroma instance
+        for note in notebook.notes.all():
+            # add to ChromaDB
+
+            # turn text content into Document form
+            text_splitter = CharacterTextSplitter()
+            curr_doc = Document(page_content=note.content)
+            documents = [curr_doc]
+            docs = text_splitter.split_documents(documents)
+            ids = [note.title + str(i) for i in range(1, len(docs) + 1)]
+
+            # actually add to ChromaDB instance
+            embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+            chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"), ids=ids)
+            chroma_db.persist()
+
+            # update variable in note object
+            note.chroma_parts = len(docs)
+
+            db.session.add(note)
+
+    return "Success!"
+
+
 # GET endpoint for OpenAI query (Making this a post request so we can send a long string in the body if necessary)
-# FOR FUTURE: separate the chromadb from this request. This may involve storing it in a database
 @app.route('/query', methods=['POST'])
 def query():
     uid = request.json["uid"]
@@ -322,7 +360,7 @@ def query():
 
     # query on it
     # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    db = Chroma(persist_directory=(uid + os.environ["PERSIST_DIRECTORY"]), embedding_function=embedding_function)
+    db = Chroma(persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"), embedding_function=embedding_function)
     docs = db.similarity_search(query_string, k=int(user.similarity))
 
     temp_str = "summarize the following in " + str(user.wordcount) + " words or less: "

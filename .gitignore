@@ -5,3 +5,4 @@ chromadb/
 myenv/
 __pycache__/
 app.py
+var/
