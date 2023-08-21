@@ -345,7 +345,7 @@ def create_chromadb():
             db.session.commit()
 
     # actually add to ChromaDB instance
-    # chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
+    chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
     # chroma_db.persist()
 
     return "Success!"
