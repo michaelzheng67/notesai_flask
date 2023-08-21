@@ -6,3 +6,4 @@ myenv/
 __pycache__/
 app.py
 var/
+flask_langchain/

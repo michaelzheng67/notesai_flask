@@ -324,6 +324,8 @@ def create_chromadb():
     # Iterate over all the notebooks owned by the user
     for notebook in user.notebook:
         
+        all_docs = []
+
         # iterate over each note and add it to chroma instance
         for note in notebook.notes.all():
             # add to ChromaDB
@@ -333,16 +335,19 @@ def create_chromadb():
             curr_doc = Document(page_content=note.content)
             documents = [curr_doc]
             docs = text_splitter.split_documents(documents)
-            ids = [note.title + str(i) for i in range(1, len(docs) + 1)]
-
-            # actually add to ChromaDB instance
-            chroma_db = Chroma.from_documents(docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"), ids=ids)
-            chroma_db.persist()
+            for doc in docs:
+                all_docs.append(doc)
+            #ids = [note.title + str(i) for i in range(1, len(docs) + 1)]
 
             # update variable in note object
             note.chroma_parts = len(docs)
 
             db.session.add(note)
+            db.session.commit()
+
+        # actually add to ChromaDB instance
+        chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
+        chroma_db.persist()
 
     return "Success!"
 
