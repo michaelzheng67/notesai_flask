@@ -19,7 +19,6 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
 from langchain import PromptTemplate
 
-embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 app = Flask(__name__)
 
 # Centralized endpoints that allow for storage as well as calls to langchain / openAI
@@ -322,9 +321,9 @@ def create_chromadb():
     
     
     # Iterate over all the notebooks owned by the user
+    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    all_docs = []
     for notebook in user.notebook:
-        
-        all_docs = []
 
         # iterate over each note and add it to chroma instance
         for note in notebook.notes.all():
@@ -345,9 +344,9 @@ def create_chromadb():
             db.session.add(note)
             db.session.commit()
 
-        # actually add to ChromaDB instance
-        chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
-        chroma_db.persist()
+    # actually add to ChromaDB instance
+    # chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
+    # chroma_db.persist()
 
     return "Success!"
 
@@ -364,11 +363,12 @@ def query():
 
     # query on it
     # embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     db = Chroma(persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"), embedding_function=embedding_function)
     docs = db.similarity_search(query_string, k=int(user.similarity))
 
-    temp_str = "summarize the following in " + str(user.wordcount) + " words or less: "
-    PROMPT = PromptTemplate.from_template(template=temp_str + "{text}")
+    #temp_str = query_string + " Answer my question in " + str(user.wordcount) + " words or less."
+    PROMPT = PromptTemplate.from_template(template=query_string + "{text}")
 
     
     llm = OpenAI(temperature=float(user.temperature)) # PLACE THIS SOMEWHERE ELSE
