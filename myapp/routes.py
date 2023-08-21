@@ -324,6 +324,7 @@ def create_chromadb():
     # Iterate over all the notebooks owned by the user
     embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     all_docs = []
+
     for notebook in user.notebook:
 
         # iterate over each note and add it to chroma instance
@@ -344,6 +345,12 @@ def create_chromadb():
 
             db.session.add(note)
             db.session.commit()
+
+    # remove the existing instance first
+    path_to_check = os.environ["CHROMA_STORE"] + uid + "/chromadb"
+    
+    if os.path.exists(path_to_check):
+        shutil.rmtree(path_to_check)
 
     # actually add to ChromaDB instance
     chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
