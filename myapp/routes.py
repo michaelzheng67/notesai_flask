@@ -18,6 +18,7 @@ from langchain.llms import OpenAI
 from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
 from langchain import PromptTemplate
+from langchain.chains import RetrievalQA
 
 app = Flask(__name__)
 
@@ -368,15 +369,32 @@ def query():
     docs = db.similarity_search(query_string, k=int(user.similarity))
 
     #temp_str = query_string + " Answer my question in " + str(user.wordcount) + " words or less."
-    PROMPT = PromptTemplate.from_template(template=query_string + "{text}")
+    # PROMPT = PromptTemplate.from_template(template=query_string + "{text}")
+    prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+    {context}
+
+    Question: {question}
+    Helpful Answer:"""
+    PROMPT = PromptTemplate(
+        template=prompt_template, input_variables=["context", "question"]
+    )
 
     
     llm = OpenAI(temperature=float(user.temperature)) # PLACE THIS SOMEWHERE ELSE
-    chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
-    return_output = chain.run(docs)
+    # chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
+    # return_output = chain.run(docs)
+    qa_chain = RetrievalQA.from_chain_type(
+    llm,
+    retriever=db.as_retriever(),
+    chain_type_kwargs={"prompt": PROMPT},
+    )
+
+    return_output = qa_chain({"query": query_string})
 
 
-    return jsonify(result=return_output)
+    # return jsonify(result=return_output)
+    return jsonify(result=return_output["result"])
 
 
 
