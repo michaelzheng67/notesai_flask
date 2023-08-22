@@ -62,6 +62,7 @@ def get_documents():
     notes_list = []
     for note in notebook_obj.notes:
         notes_list.append({
+            'id': note._uid,
             'title': note.title,
             'content': note.content,
             'base64String' : note.base64_string
@@ -76,6 +77,7 @@ def get_documents():
 @app.route("/update", methods=["POST"])
 def update_document():
     uid = request.json["uid"]
+    id = request.json["id"]
     title = request.json["title"]
     content = request.json["content"]
     notebook = request.json["notebook"]
@@ -97,8 +99,8 @@ def update_document():
         db.session.add(notebook_obj)
 
 
-    # check if note with the given title already exists in the notebook
-    existing_note = notes.query.filter_by(notebook_id=notebook_obj._id, title=title).first()
+    # check if note with the given id already exists in the notebook
+    existing_note = notes.query.filter_by(notebook_id=notebook_obj._id, id=id).first()
 
     # UPDATE
     if existing_note:
@@ -165,10 +167,6 @@ def post_document():
     if not notebook_obj:
         notebook_obj = notebooks(user_id=user._id, name=notebook)
         db.session.add(notebook_obj)
-
-
-    # check if note with the given title already exists in the notebook
-    existing_note = notes.query.filter_by(notebook_id=notebook_obj._id, title=title).first()
 
 
     # POST
