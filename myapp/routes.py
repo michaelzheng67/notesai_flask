@@ -100,7 +100,7 @@ def update_document():
 
 
     # check if note with the given id already exists in the notebook
-    existing_note = notes.query.filter_by(notebook_id=notebook_obj._id, id=id).first()
+    existing_note = notes.query.filter_by(notebook_id=notebook_obj._id, _id=id).first()
 
     # UPDATE
     if existing_note:
