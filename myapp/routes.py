@@ -301,6 +301,10 @@ def delete_notebook():
         if notebook_to_delete is None:
             print("Notebook not found") # Handle this as needed
         else:
+            # First delete all existing notes in notebook
+            for note in notebook_to_delete.notes:
+                db.session.delete(note)
+
             # Delete the notebook
             db.session.delete(notebook_to_delete)
             db.session.commit()
@@ -401,8 +405,13 @@ def query():
     chain_type_kwargs={"prompt": PROMPT},
     )
 
-    return_output = qa_chain({"query": query_string})
+    return_output = None
 
+    if notebook != None or notebook != "All":
+        return_output = qa_chain({"query": query_string, "k": user.similarity, "search_kwargs": {"filter": {"source": notebook}}})
+
+    else:
+        return_output = qa_chain({"query": query_string, "k": user.similarity})
 
     # return jsonify(result=return_output)
     return jsonify(result=return_output["result"])
