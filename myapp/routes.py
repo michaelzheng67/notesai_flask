@@ -399,19 +399,23 @@ def query():
     llm = OpenAI(temperature=float(user.temperature)) # PLACE THIS SOMEWHERE ELSE
     # chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
     # return_output = chain.run(docs)
-    qa_chain = RetrievalQA.from_chain_type(
-    llm,
-    retriever=db.as_retriever(),
-    chain_type_kwargs={"prompt": PROMPT},
-    )
 
-    return_output = None
-
+    qa_chain = None
     if notebook != None or notebook != "All":
-        return_output = qa_chain({"query": query_string, "k": user.similarity, "search_kwargs": {"filter": {"source": notebook}}})
-
+        qa_chain = RetrievalQA.from_chain_type(
+        llm,
+        retriever=db.as_retriever(search_kwargs={"filter": {"source": notebook}}),
+        chain_type_kwargs={"prompt": PROMPT},
+        )
+    
     else:
-        return_output = qa_chain({"query": query_string, "k": user.similarity})
+        qa_chain = RetrievalQA.from_chain_type(
+        llm,
+        retriever=db.as_retriever(),
+        chain_type_kwargs={"prompt": PROMPT},
+        )
+
+    return_output = qa_chain({"query": query_string, "k": user.similarity})
 
     # return jsonify(result=return_output)
     return jsonify(result=return_output["result"])
