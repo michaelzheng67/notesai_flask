@@ -62,7 +62,7 @@ def get_documents():
     notes_list = []
     for note in notebook_obj.notes:
         notes_list.append({
-            'id': note._uid,
+            'id': note._id,
             'title': note.title,
             'content': note.content,
             'base64String' : note.base64_string
@@ -335,6 +335,11 @@ def create_chromadb():
             documents = [curr_doc]
             docs = text_splitter.split_documents(documents)
             for doc in docs:
+                # give the doc necessary metadata for search before inserting it into chroma
+                doc.metadata = {
+                    "source" : notebook.name,
+                }
+
                 all_docs.append(doc)
             #ids = [note.title + str(i) for i in range(1, len(docs) + 1)]
 
