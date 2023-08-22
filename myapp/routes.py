@@ -114,6 +114,7 @@ def update_document():
 
 
         # update the existing note's content
+        existing_note.title = title
         existing_note.content = content
         existing_note.base64_string = base64String
 
@@ -196,12 +197,12 @@ def post_document():
     return "success!"
 
 
-# DELETE endpoint for existing documents. Specify notebook and note title
+# DELETE endpoint for existing documents. Specify notebook and note id
 @app.route('/delete', methods=['DELETE'])
 def delete_document():
     uid = request.args.get('uid')
     notebook = request.args.get('notebook')  # Get notebook from query string
-    title = request.args.get('title')   
+    id = request.args.get('id') # Get note id 
 
     user = users.query.filter_by(user_id=uid).first()
 
@@ -210,13 +211,13 @@ def delete_document():
     if notebook_obj is None:
         return jsonify({'error': 'Notebook not found'})
 
-    # Retrieve the note by title within the notebook
-    note_obj = notes.query.filter_by(notebook_id=notebook_obj._id, title=title).first()
+    # Retrieve the note by id within the notebook
+    note_obj = notes.query.filter_by(notebook_id=notebook_obj._id, _id=id).first()
 
     if note_obj is None:
         print("Note not found")
         print(notebook_obj._id)
-        print(title)
+        print(id)
         return jsonify({'error': 'Note not found'})
 
     # Delete the note
