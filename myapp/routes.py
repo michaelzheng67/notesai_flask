@@ -401,7 +401,7 @@ def query():
     # return_output = chain.run(docs)
 
     qa_chain = None
-    if notebook != None or notebook != "All":
+    if notebook != None and notebook != "All":
         qa_chain = RetrievalQA.from_chain_type(
         llm,
         retriever=db.as_retriever(search_kwargs={"filter": {"source": notebook}}),
