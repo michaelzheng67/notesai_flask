@@ -67,6 +67,8 @@ def get_documents():
             'content': note.content,
             'base64String' : note.base64_string
         })
+    
+    notes_list = sorted(notes_list, key=lambda x: x['id'])
 
 
     # Return the notes as a JSON object
