@@ -370,19 +370,19 @@ def create_chromadb():
     return "Success!"
 
 
-def get_uid_from_request():
-    return request.json.get("uid", "")
+# def get_uid_from_request():
+#     return request.json.get("uid", "")
 
-limiter = Limiter(
-    app=app,
-    key_func=get_uid_from_request,
-    default_limits=["200 per day", "50 per hour"]
-)
+# limiter = Limiter(
+#     app=app,
+#     key_func=get_uid_from_request,
+#     default_limits=["200 per day", "50 per hour"]
+# )
 
 
 # GET endpoint for OpenAI query (Making this a post request so we can send a long string in the body if necessary)
 @app.route('/query', methods=['POST'])
-@limiter.limit("1 per minute")
+# @limiter.limit("1 per minute")
 def query():
     uid = request.json["uid"]
     query_string = request.json["query_string"]
