@@ -23,6 +23,24 @@ from langchain.chains import RetrievalQA
 
 app = Flask(__name__)
 
+# Limiter helper function and initialization for /query endpoint
+def get_uid_from_request():
+    try:
+        # Check if we're on the /query endpoint
+        if request.endpoint == 'query':  
+            return request.json.get("uid", "")
+        else:
+            return request.remote_addr  # Or return any default value
+    except Exception as e:
+        print(f"Error getting UID: {e}")
+        return request.remote_addr  # Or return any default value
+
+limiter = Limiter(
+    app=app,
+    key_func=get_uid_from_request,
+    default_limits=["200 per day", "50 per hour"]
+)
+
 # Centralized endpoints that allow for storage as well as calls to langchain / openAI
 
 @app.route("/")
@@ -146,6 +164,7 @@ def update_document():
     
 # POST endpoint for new documents. Specify notebook and note title / content
 @app.route("/post", methods=["POST"])
+@limiter.limit("20 per hour")
 def post_document():
     uid = request.json["uid"]
     title = request.json["title"]
@@ -370,19 +389,9 @@ def create_chromadb():
     return "Success!"
 
 
-# def get_uid_from_request():
-#     return request.json.get("uid", "")
-
-# limiter = Limiter(
-#     app=app,
-#     key_func=get_uid_from_request,
-#     default_limits=["200 per day", "50 per hour"]
-# )
-
-
 # GET endpoint for OpenAI query (Making this a post request so we can send a long string in the body if necessary)
 @app.route('/query', methods=['POST'])
-# @limiter.limit("1 per minute")
+@limiter.limit("100 per hour")
 def query():
     uid = request.json["uid"]
     query_string = request.json["query_string"]
@@ -399,11 +408,11 @@ def query():
 
     #temp_str = query_string + " Answer my question in " + str(user.wordcount) + " words or less."
     # PROMPT = PromptTemplate.from_template(template=query_string + "{text}")
-    prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    prompt_template = f"""Use the following pieces of context to answer the question at the end in {user.wordcount} words or less. If you don't know the answer, just say that you don't know, don't try to make up an answer.
 
-    {context}
+    {{context}}
 
-    Question: {question}
+    Question: {{question}}
     Helpful Answer:"""
     PROMPT = PromptTemplate(
         template=prompt_template, input_variables=["context", "question"]
