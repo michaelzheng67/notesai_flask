@@ -374,7 +374,7 @@ def get_uid_from_request():
     return request.json.get("uid", "")
 
 limiter = Limiter(
-    app,
+    app=app,
     key_func=get_uid_from_request,
     default_limits=["200 per day", "50 per hour"]
 )
