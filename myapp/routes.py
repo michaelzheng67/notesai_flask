@@ -280,6 +280,8 @@ def get_notebooks(uid):
                 'label' : notebook.name
             })
 
+    notebooks_list = sorted(notebooks_list, key=lambda x: x['id'])
+
     return json.dumps(notebooks_list)
     
 # UPDATE endpoint for a given notebook
