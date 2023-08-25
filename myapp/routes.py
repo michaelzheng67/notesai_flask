@@ -276,11 +276,33 @@ def get_notebooks(uid):
     if user.notebook:
         for notebook in user.notebook:
             notebooks_list.append({
+                'id' : notebook._id,
                 'label' : notebook.name
             })
 
     return json.dumps(notebooks_list)
     
+# UPDATE endpoint for a given notebook
+@app.route("/update-notebook", methods=["POST"])
+def update_notebook():
+    uid = request.json["uid"]
+    notebook_name = request.json["notebook"]
+    notebook_id = request.json["notebook_id"]
+
+    user = users.query.filter_by(user_id=uid).first()
+
+    if user is None:
+        print('User not found')  # Or handle this situation differently, e.g., return an error response
+    
+    # fetch notebook by id then update it and commit
+    else:
+        notebook = notebooks.query.filter_by(_id =notebook_id).first()
+        notebook.name = notebook_name
+
+        db.session.add(notebook)
+        db.session.commit()
+
+    return "success!"
 
 
 # POST endpoint for a given notebook
