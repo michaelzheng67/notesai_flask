@@ -298,7 +298,7 @@ def update_notebook():
     
     # fetch notebook by id then update it and commit
     else:
-        notebook = notebooks.query.filter_by(_id =notebook_id).first()
+        notebook = notebooks.query.filter_by(user_id=user._id, _id =notebook_id).first()
         notebook.name = notebook_name
 
         db.session.add(notebook)
@@ -318,9 +318,13 @@ def post_notebook():
     if user is None:
         print('User not found')  # Or handle this situation differently, e.g., return an error response
     
+    existing_notebook = notebooks.query.filter_by(user_id=uid, name=notebook).first()
+    if existing_notebook is not None:
+        print('Notebook already exists!')
+
     else:
         new_notebook = notebooks(name=notebook)
-        new_notebook.user = user
+        new_notebook.user_id = user._id
     
         db.session.add(new_notebook)
         db.session.commit()
