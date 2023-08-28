@@ -38,7 +38,7 @@ def get_uid_from_request():
 limiter = Limiter(
     app=app,
     key_func=get_uid_from_request,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["1000 per hour"]
 )
 
 # Centralized endpoints that allow for storage as well as calls to langchain / openAI

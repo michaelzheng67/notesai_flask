@@ -119,16 +119,19 @@ def test_post_notes_different_name_different_people(client, app):
 
 
 # DELETE endpoint
+
 def test_delete_notes(client, app):
-    # first create user and create notebook(s)
+    # first create user
     client.post("/register-user", json={"uid":"1"})
     client.post("/post-notebook", json={"uid":"1", "notebook":"notebook"})
-    # client.post("/post", json={"uid":"1", "title":"title1", "content":"content3", 
-    #                                       "notebook":"notebook1", "base64String":"base64Stringasdfgh"})
 
-    # response = client.delete("/delete?uid=1&notebook=notebook1&id=1")
-        
+    client.post("/post", json={"uid":"1", "title":"title", "content":"content", 
+                                          "notebook":"notebook", "base64String":"base64String"})
+    
+    response = client.delete("/delete", query_string={"uid":"1", "notebook":"notebook", "id":"1"})
+    
     with app.app_context():
+
         assert users.query.count() == 1
         assert notebooks.query.count() == 1
         assert notes.query.count() == 0
