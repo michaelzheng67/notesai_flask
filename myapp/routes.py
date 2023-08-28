@@ -191,6 +191,11 @@ def post_document():
         notebook_obj = notebooks(user_id=user._id, name=notebook)
         db.session.add(notebook_obj)
 
+    # first, check to see if note already in notebook
+    existing_note = notes.query.filter_by(notebook_id=notebook_obj._id, title=title).first() 
+    if existing_note != None:
+        return "note with title already exists!"
+
 
     # POST
     # create note and insert into notebook
@@ -318,7 +323,7 @@ def post_notebook():
     if user is None:
         print('User not found')  # Or handle this situation differently, e.g., return an error response
     
-    existing_notebook = notebooks.query.filter_by(user_id=uid, name=notebook).first()
+    existing_notebook = notebooks.query.filter_by(user_id=user._id, name=notebook).first()
     if existing_notebook is not None:
         print('Notebook already exists!')
 
