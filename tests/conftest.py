@@ -1,10 +1,12 @@
 import pytest
 
 from myapp import create_app_testing, db
+from myapp.routes import limiter
 
 @pytest.fixture()
 def app():
     app = create_app_testing("sqlite://")
+    limiter.enabled = False  # Disable rate limiting
 
     with app.app_context():
         db.create_all()

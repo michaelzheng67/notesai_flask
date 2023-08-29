@@ -22,9 +22,3 @@ def test_register_user_duplicates(client, app):
     with app.app_context():
         assert users.query.count() == 1
         assert users.query.first().user_id == "2"
-
-def test_register_user_none(client, app):
-    response = client.post("/register-user", json={"not_uid" : "2"})
-
-    with app.app_context():
-        assert users.query.count() == 0

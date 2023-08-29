@@ -34,11 +34,11 @@ def get_uid_from_request():
     except Exception as e:
         print(f"Error getting UID: {e}")
         return request.remote_addr  # Or return any default value
-
+    
 limiter = Limiter(
     app=app,
     key_func=get_uid_from_request,
-    default_limits=["1000 per hour"]
+    default_limits=["100 per hour"]
 )
 
 # Centralized endpoints that allow for storage as well as calls to langchain / openAI
@@ -160,6 +160,8 @@ def update_document():
         db.session.commit()
 
         return "Success!"
+    
+    return "Note doesn't exist!"
 
     
 # POST endpoint for new documents. Specify notebook and note title / content
