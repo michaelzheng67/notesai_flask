@@ -372,50 +372,51 @@ def delete_notebook():
 # POST endpoint for creating chromadb for given user
 @app.route('/create-chroma', methods=['POST'])
 def create_chromadb():
+    uid = request.json["uid"]
 
     embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    all_users = users.query.all()
+    user = users.query.filter_by(user_id=uid).first()
 
+    # Iterate over all the notebooks owned by the user
+    uid = user.user_id
+    all_docs = []
+
+    for notebook in user.notebook:
+
+        # iterate over each note and add it to chroma instance
+        for note in notebook.notes.all():
+            # add to ChromaDB
+
+            # turn text content into Document form
+            text_splitter = CharacterTextSplitter()
+            curr_doc = Document(page_content=note.content)
+            documents = [curr_doc]
+
+            
+            docs = text_splitter.split_documents(documents)
+            for doc in docs:
+                # give the doc necessary metadata for search before inserting it into chroma
+                doc.metadata = {
+                    "source" : notebook.name,
+                }
+
+                all_docs.append(doc)
+
+            # update variable in note object
+            note.chroma_parts = len(docs)
+
+            db.session.add(note)
+            db.session.commit()
+
+    # remove the existing instance first
+    path_to_check = os.environ["CHROMA_STORE"] + uid + "/chromadb"
     
-    for user in all_users:
-        # Iterate over all the notebooks owned by the user
-        uid = user.user_id
-        all_docs = []
+    if os.path.exists(path_to_check):
+        shutil.rmtree(path_to_check)
 
-        for notebook in user.notebook:
-
-            # iterate over each note and add it to chroma instance
-            for note in notebook.notes.all():
-                # add to ChromaDB
-
-                # turn text content into Document form
-                text_splitter = CharacterTextSplitter()
-                curr_doc = Document(page_content=note.content)
-                documents = [curr_doc]
-                docs = text_splitter.split_documents(documents)
-                for doc in docs:
-                    # give the doc necessary metadata for search before inserting it into chroma
-                    doc.metadata = {
-                        "source" : notebook.name,
-                    }
-
-                    all_docs.append(doc)
-                #ids = [note.title + str(i) for i in range(1, len(docs) + 1)]
-
-                # update variable in note object
-                note.chroma_parts = len(docs)
-
-                db.session.add(note)
-                db.session.commit()
-
-        # remove the existing instance first
-        path_to_check = os.environ["CHROMA_STORE"] + uid + "/chromadb"
-        
-        if os.path.exists(path_to_check):
-            shutil.rmtree(path_to_check)
-
+    if len(all_docs) > 0:
         # actually add to ChromaDB instance
-        chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=(os.environ["CHROMA_STORE"] + uid + "/chromadb"))
+        chroma_db = Chroma.from_documents(all_docs, embedding_function, persist_directory=path_to_check)
         chroma_db.persist()
 
     return "Success!"
