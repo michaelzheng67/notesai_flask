@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CHROMA_STORE: ./
+      DATABASE_URL: postgresql://notesai_user:LS9drpA2s84V7RDtkCwuWwDKJTSl3C78@dpg-cjeh0egcfp5c73en5s40-a.ohio-postgres.render.com/notesai
+      TOKENIZERS_PARALLELISM: false
 
     steps:
     - name: Checkout code
