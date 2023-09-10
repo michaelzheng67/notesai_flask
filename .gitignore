@@ -2,8 +2,8 @@
 instance/
 langchain_data/
 chromadb/
-myenv/
 __pycache__/
+myenv/
 app.py
 var/
 flask_langchain/
