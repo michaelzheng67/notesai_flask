@@ -20,6 +20,10 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
 from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
+from langchain.chains.llm import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chat_models import ChatOpenAI
 
 app = Flask(__name__)
 
@@ -427,6 +431,7 @@ def create_chromadb():
 @limiter.limit("100 per hour")
 def query():
     uid = request.json["uid"]
+    #history = request.json["history"]
     query_string = request.json["query_string"]
     notebook = request.json["notebook"]
 
@@ -475,6 +480,56 @@ def query():
 
     # return jsonify(result=return_output)
     return jsonify(result=return_output["result"])
+
+
+# GET endpoint to summarize notebook / note with Langchain (Making this a post request so we can send a long string in the body if necessary)
+@app.route('/summarize', methods=['POST'])
+@limiter.limit("100 per hour")
+def summarize():
+    uid = request.json["uid"]
+    notebook_id = request.json["notebook_id"]
+    note = request.json["note"]
+    note_id = request.json["note_id"]
+
+    user = users.query.filter_by(user_id=uid).first()
+    notebook_obj = notebooks.query.filter_by(user_id=user._id, _id=notebook_id).first()
+    note_obj = None
+    
+    if note != None:
+        note_obj = notes.query.filter_by(notebook_id=notebook_obj._id, _id=note_id).first()
+
+
+    # Define prompt
+    prompt_template = """Write a concise summary of the following:
+    "{text}"
+    CONCISE SUMMARY:"""
+    prompt = PromptTemplate.from_template(prompt_template)
+
+    # Define LLM chain
+    llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-16k")
+    llm_chain = LLMChain(llm=llm, prompt=prompt)
+
+    # Define StuffDocumentsChain
+    stuff_chain = StuffDocumentsChain(
+        llm_chain=llm_chain, document_variable_name="text"
+    )
+
+    # Create list of documents 
+    docs = []
+
+    # querying on all notebook content
+    if note_obj == None:
+        for note in notebook_obj.notes.all():
+            curr_doc = Document(page_content=note.content)
+            docs.append(curr_doc)
+
+    # querying on specific note
+    else:
+        curr_doc = note_obj.content 
+        docs = [curr_doc]
+
+    result = stuff_chain.run(docs)
+    return jsonify(result=result)
 
 
 
