@@ -48,6 +48,7 @@ limiter = Limiter(
 # Centralized endpoints that allow for storage as well as calls to langchain / openAI
 
 @app.route("/")
+@limiter.exempt
 def hello_world():
     return "<p>Hello, World!</p>"
 
@@ -500,7 +501,7 @@ def summarize():
 
 
     # Define prompt
-    prompt_template = """Write a concise summary of the following:
+    prompt_template = """Write a concise summary of the following in at most 200 words, preferably less while using bullet points:
     "{text}"
     CONCISE SUMMARY:"""
     prompt = PromptTemplate.from_template(prompt_template)
