@@ -526,7 +526,7 @@ def summarize():
 
     # querying on specific note
     else:
-        curr_doc = note_obj.content 
+        curr_doc = Document(page_content=note_obj.content)
         docs = [curr_doc]
 
     result = stuff_chain.run(docs)
