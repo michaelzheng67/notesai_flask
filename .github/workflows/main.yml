@@ -35,10 +35,12 @@ jobs:
         source env/bin/activate
         pytest
 
+    - name: Fetch Source Branch
+      run: git fetch origin ${{ github.head_ref }}
+
     - name: Merge to main branch
       if: success()  # This will ensure this step is only run if the previous steps were successful
       run: |
-        git fetch --all
         git checkout main
-        git merge --no-ff "${{ github.head_ref }}"
+        git merge --no-ff origin/${{ github.head_ref }}
         git push origin main
