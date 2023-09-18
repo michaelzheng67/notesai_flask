@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # This will ensure the entire git history is downloaded    
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -36,6 +38,7 @@ jobs:
     - name: Merge to main branch
       if: success()  # This will ensure this step is only run if the previous steps were successful
       run: |
+        git fetch --all
         git checkout main
         git merge --no-ff "${{ github.head_ref }}"
         git push origin main
