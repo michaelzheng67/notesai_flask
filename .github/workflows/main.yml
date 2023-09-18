@@ -32,3 +32,10 @@ jobs:
       run: |
         source env/bin/activate
         pytest
+
+    - name: Merge to main branch
+      if: success()  # This will ensure this step is only run if the previous steps were successful
+      run: |
+        git checkout main
+        git merge --no-ff "${{ github.head_ref }}"
+        git push origin main
