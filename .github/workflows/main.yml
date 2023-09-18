@@ -5,6 +5,9 @@ on:
     branches:
       - '**'  # This will match all branches
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,7 +20,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0  # This will ensure the entire git history is downloaded    
+        fetch-depth: 0  # This will ensure the entire git history is downloaded   
+        
+    - name: Cache Python dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Set up Python
       uses: actions/setup-python@v2
