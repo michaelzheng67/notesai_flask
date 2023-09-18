@@ -35,6 +35,11 @@ jobs:
         source env/bin/activate
         pytest
 
+    - name: Set Git user
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
     - name: Fetch Source Branch
       run: git fetch origin ${{ github.head_ref }}
 
