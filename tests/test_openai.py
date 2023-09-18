@@ -1,4 +1,4 @@
-from myapp.models import users
+from myapp.models import users, notebooks, notes
 from unittest.mock import Mock, patch
 
 # POST settings
@@ -64,11 +64,48 @@ def test_get_settings_multiple_users(client, app):
         assert data_2["wordcount"] == 20
 
 
+# Create Chroma endpoint
+
+def test_create_chroma(client, app):
+    pass
+
+def test_create_chroma_multiple_users(client, app):
+    pass
+
+
 # OPENAI endpoint
 
 def test_get_openai(client, app):
+    # first create user
+    # client.post("/register-user", json={"uid":"1"})
+    # client.post("/post-notebook", json={"uid":"1", "notebook":"notebook"})
+
+    # content = "My name is Michael and my favourite sport is basketball"
+    # client.post("/post", json={"uid":"1", "title":"title", "content":content, 
+    #                                       "notebook":"notebook", "base64String":"base64String"})
+    # response = client.post("/query", json={"uid":"1", "query_string":"What is Michael's favourite sport?", "notebook":"notebook"})
+    
+    # with app.app_context():
+    #     notebook_id = notebooks.query.filter_by(user_id=1, name="notebook").first()._id
+
+    #     assert users.query.count() == 1
+    #     assert notebooks.query.count() == 1
+    #     assert notes.query.count() == 1
+    #     assert notes.query.filter_by(notebook_id=notebook_id, title="title", 
+    #                                  content=content, base64_string="base64String").first() != None
+    #     assert len(response.result.split()) <= 50
+    #     print(response.result)
     pass
 
 def test_get_openai_multiple_users(client, app):
+    pass
+
+
+# Summarize endpoint
+
+def test_summarize(client, app):
+    pass
+
+def test_summarize_multiple_users(client, app):
     pass
 
