@@ -39,7 +39,7 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/michaelzheng67/notesai_flask.git
+        git remote set-url origin https://x-access-token:${{ secrets.MY_GIT_TOKEN }}@github.com/michaelzheng67/notesai_flask.git
       
     - name: Fetch Source Branch
       run: git fetch origin ${{ github.head_ref }}
