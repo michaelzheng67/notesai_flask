@@ -16,13 +16,11 @@ from langchain import PromptTemplate
 
 # Langchain / OpenAI stuff
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["OPENAI_API_KEY"] = "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"
 
 # Database stuff
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://notesai_user:LS9drpA2s84V7RDtkCwuWwDKJTSl3C78@dpg-cjeh0egcfp5c73en5s40-a.ohio-postgres.render.com/notesai'
 #'sqlite:///users.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
